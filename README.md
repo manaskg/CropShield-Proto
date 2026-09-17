@@ -75,5 +75,5 @@ npm run dev
 
 ## 🌐 Deployment
 
-- **Frontend**: Ready for deployment on [Netlify](https://www.netlify.com/) (configured with `netlify.toml` and SPA redirects).
-- **Backend**: Ready for deployment on [Render](https://render.com/)
+- **Frontend**: Deployed on [Netlify](https://www.netlify.com/)
+- **Backend**: Deployed on [Render](https://render.com/)
