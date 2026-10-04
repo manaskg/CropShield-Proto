@@ -1,6 +1,11 @@
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
+/**
+ * Accesses authenticated user state, registration, login, logout, and scan history actions.
+ *
+ * @returns {object} { user, token, isAuthenticated, login, register, logout, history, addToHistory, removeFromHistory }
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -8,3 +13,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default useAuth;

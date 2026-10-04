@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * Translates WMO meteorological weather codes into localized weather descriptions
+ * @param {number} code - WMO weather code
+ * @param {'en'|'hi'|'bn'} lang - Language code
+ * @returns {string} Localized weather description
+ */
 function getWeatherCondition(code, lang) {
   const isHindi = lang === 'hi';
   const isBengali = lang === 'bn';
@@ -14,23 +20,36 @@ function getWeatherCondition(code, lang) {
   return isHindi ? 'साफ़' : isBengali ? 'পরিষ্কার' : 'Clear';
 }
 
+/**
+ * Converts wind direction in degrees to cardinal direction abbreviation
+ * @param {number} degrees - Wind degree (0-360)
+ * @returns {string} Cardinal direction (e.g. 'NE')
+ */
 function getWindDirection(degrees) {
   const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
   const index = Math.round(degrees / 45) % 8;
   return directions[index];
 }
 
+/**
+ * Fetches real-time localized weather data from Open-Meteo API using browser geolocation
+ *
+ * @param {string} [lang='en'] - Output language
+ * @returns {Promise<{temperature: number, humidity: number, condition: string, windSpeed: string, windDirection: string, isRainy: boolean}>}
+ */
 export const fetchWeather = async (lang = 'en') => {
   return new Promise((resolve) => {
+    const defaultFallback = {
+      temperature: 28,
+      humidity: 65,
+      condition: getWeatherCondition(1, lang),
+      windSpeed: '12 km/h',
+      windDirection: 'NE',
+      isRainy: false,
+    };
+
     if (!navigator.geolocation) {
-      return resolve({
-        temperature: 28,
-        humidity: 65,
-        condition: getWeatherCondition(1, lang),
-        windSpeed: '12 km/h',
-        windDirection: 'NE',
-        isRainy: false,
-      });
+      return resolve(defaultFallback);
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -43,7 +62,9 @@ export const fetchWeather = async (lang = 'en') => {
           if (!response.ok) throw new Error('Weather fetch failed');
           const data = await response.json();
           const current = data.current;
-          const isRainy = (current.weather_code >= 51 && current.weather_code <= 67) || (current.weather_code >= 80 && current.weather_code <= 82);
+          const isRainy =
+            (current.weather_code >= 51 && current.weather_code <= 67) ||
+            (current.weather_code >= 80 && current.weather_code <= 82);
 
           resolve({
             temperature: Math.round(current.temperature_2m),
@@ -53,33 +74,22 @@ export const fetchWeather = async (lang = 'en') => {
             windDirection: getWindDirection(current.wind_direction_10m),
             isRainy,
           });
-        } catch (e) {
-          resolve({
-            temperature: 28,
-            humidity: 65,
-            condition: getWeatherCondition(1, lang),
-            windSpeed: '10 km/h',
-            windDirection: 'E',
-            isRainy: false,
-          });
+        } catch (_) {
+          resolve(defaultFallback);
         }
       },
-      () => {
-        // Fallback on permission denied
-        resolve({
-          temperature: 28,
-          humidity: 65,
-          condition: getWeatherCondition(1, lang),
-          windSpeed: '10 km/h',
-          windDirection: 'NE',
-          isRainy: false,
-        });
-      },
+      () => resolve(defaultFallback),
       { timeout: 8000 }
     );
   });
 };
 
+/**
+ * React hook to subscribe to real-time environmental weather telemetry
+ *
+ * @param {string} [lang='en'] - Output language
+ * @returns {{weather: object|null, loading: boolean}}
+ */
 export const useWeather = (lang = 'en') => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -92,8 +102,12 @@ export const useWeather = (lang = 'en') => {
         setLoading(false);
       }
     });
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [lang]);
 
   return { weather, loading };
 };
+
+export default useWeather;

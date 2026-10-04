@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+/**
+ * Standardized Axios HTTP client instance with automatic JWT auth injection
+ * and clean error message unwrapping.
+ */
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: {
@@ -8,7 +12,7 @@ const apiClient = axios.create({
   timeout: 45000,
 });
 
-// Request Interceptor: Attach JWT Token if available
+// Request Interceptor: Attach JWT Token from localStorage if present
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('cropshield_token');
@@ -20,17 +24,14 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Clean error extraction & 401 handling
+// Response Interceptor: Automatically unwrap response data & format error messages
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 401) {
-      // Optional: Clear invalid session token if desired
-      if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/signup')) {
-        // localStorage.removeItem('cropshield_token');
-      }
-    }
-    const message = error.response?.data?.message || error.message || 'Network error occurred.';
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      'A network error occurred. Please check your connection.';
     return Promise.reject(new Error(message));
   }
 );

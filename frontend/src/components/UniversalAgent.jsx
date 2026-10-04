@@ -1,268 +1,83 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { GoogleGenAI, Modality } from '@google/genai';
-import { Mic, MicOff, X, PhoneOff, MessageCircle, Minimize2, Sparkles, Sprout } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Mic,
+  MicOff,
+  X,
+  PhoneOff,
+  Minimize2,
+  Sparkles,
+  Volume2,
+  Bot,
+  User,
+  Sprout,
+  Send,
+} from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
+import { useVoiceAgent } from '../hooks/useVoiceAgent';
 
-function encode(bytes) {
-  let binary = '';
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
-
-function decode(base64) {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
-}
-
-async function decodeAudioData(data, ctx, sampleRate, numChannels) {
-  const dataInt16 = new Int16Array(data.buffer);
-  const frameCount = dataInt16.length / numChannels;
-  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
-
-  for (let channel = 0; channel < numChannels; channel++) {
-    const channelData = buffer.getChannelData(channel);
-    for (let i = 0; i < frameCount; i++) {
-      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
-    }
-  }
-  return buffer;
-}
-
+/**
+ * Universal Kisan AI Voice & Chat Advisor Floating Widget
+ */
 const UniversalAgent = () => {
-  const { language, t } = useLanguage();
-  
+  const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [error, setError] = useState(null);
-  const [agentState, setAgentState] = useState('idle');
+  const [inputText, setInputText] = useState('');
 
-  const audioContextRef = useRef(null);
-  const inputSourceRef = useRef(null);
-  const processorRef = useRef(null);
-  const streamRef = useRef(null);
-  const nextStartTimeRef = useRef(0);
-  const scheduledSourcesRef = useRef(new Set());
-  const sessionPromiseRef = useRef(null);
-  
-  const canvasRef = useRef(null);
-  const animationFrameRef = useRef(0);
-  const analyserRef = useRef(null);
+  const welcomeMessage =
+    language === 'hi'
+      ? 'नमस्ते किसान भाई! मैं किसान मित्र हूँ। फसल, मिट्टी या मौसम के बारे में बोलकर या लिखकर पूछें।'
+      : 'Hello Farmer! I am Kisan Mitra AI. Ask me anything about your crops, soil, or weather!';
 
-  const getLanguageName = () => {
-    if (language === 'hi') return 'Hindi';
-    if (language === 'bn') return 'Bengali';
-    return 'English';
-  };
+  const {
+    status,
+    transcript,
+    reply,
+    error,
+    isMuted,
+    setTranscript,
+    askAgent,
+    startListening,
+    stopListening,
+    toggleMute,
+    stopAll,
+  } = useVoiceAgent({
+    voiceName: 'Kore',
+    defaultContext: {
+      role: 'Indian Agricultural Expert assisting farmers with crops, soil, fertilizers, and weather advisories',
+    },
+  });
 
-  const stopAudio = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-      processorRef.current = null;
-    }
-    if (inputSourceRef.current) {
-      inputSourceRef.current.disconnect();
-      inputSourceRef.current = null;
-    }
-    scheduledSourcesRef.current.forEach(source => {
-      try { source.stop(); } catch (e) {}
-    });
-    scheduledSourcesRef.current.clear();
-    nextStartTimeRef.current = 0;
-    
-    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-    
-    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    setIsConnected(false);
-    setAgentState('idle');
-  }, []);
-
-  const drawVisualizer = () => {
-    if (!canvasRef.current || !analyserRef.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const bufferLength = analyserRef.current.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    const draw = () => {
-      if (!analyserRef.current) return;
-      animationFrameRef.current = requestAnimationFrame(draw);
-      analyserRef.current.getByteFrequencyData(dataArray);
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
-
-      const radius = 30 + (average / 3);
-      const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.5, centerX, centerY, radius * 2);
-      
-      if (agentState === 'speaking') {
-        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
-        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-      } else {
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-      }
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      ctx.fillStyle = gradient;
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
-      ctx.fillStyle = agentState === 'speaking' ? '#10b981' : '#ffffff';
-      ctx.fill();
-    };
-    draw();
-  };
-
-  const startSession = async () => {
-    try {
-      setError(null);
-      const apiKey = import.meta.env?.VITE_GEMINI_API_KEY || process.env?.API_KEY || process.env?.GEMINI_API_KEY;
-      if (!apiKey) throw new Error('API Key missing');
-
-      const ai = new GoogleGenAI({ apiKey });
-      const outCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
-      audioContextRef.current = outCtx;
-      analyserRef.current = outCtx.createAnalyser();
-      analyserRef.current.fftSize = 256;
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-
-      const sessionPromise = ai.live.connect({
-        model: 'gemini-2.5-flash-native-audio-preview-09-2025',
-        callbacks: {
-          onopen: () => {
-            if (!streamRef.current) return;
-            setIsConnected(true);
-            setAgentState('listening');
-
-            const inputCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
-            const source = inputCtx.createMediaStreamSource(streamRef.current);
-            const scriptProcessor = inputCtx.createScriptProcessor(4096, 1, 1);
-            inputSourceRef.current = source;
-            processorRef.current = scriptProcessor;
-
-            scriptProcessor.onaudioprocess = (e) => {
-              if (isMuted) return;
-              const inputData = e.inputBuffer.getChannelData(0);
-              const l = inputData.length;
-              const int16 = new Int16Array(l);
-              for (let i = 0; i < l; i++) {
-                int16[i] = inputData[i] * 32767;
-              }
-              const pcmData = new Uint8Array(int16.buffer);
-              
-              sessionPromiseRef.current?.then((session) => {
-                session.sendRealtimeInput({
-                  media: {
-                    mimeType: 'audio/pcm;rate=16000',
-                    data: encode(pcmData),
-                  },
-                });
-              });
-            };
-
-            source.connect(scriptProcessor);
-            scriptProcessor.connect(inputCtx.destination);
-            drawVisualizer();
-          },
-          onmessage: async (msg) => {
-            const base64Audio = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (base64Audio && audioContextRef.current) {
-              setAgentState('speaking');
-              const pcmData = decode(base64Audio);
-              const audioBuffer = await decodeAudioData(pcmData, audioContextRef.current, 24000, 1);
-              
-              const source = audioContextRef.current.createBufferSource();
-              source.buffer = audioBuffer;
-              
-              if (analyserRef.current) {
-                source.connect(analyserRef.current);
-                analyserRef.current.connect(audioContextRef.current.destination);
-              } else {
-                source.connect(audioContextRef.current.destination);
-              }
-
-              const now = audioContextRef.current.currentTime;
-              nextStartTimeRef.current = Math.max(nextStartTimeRef.current, now);
-              source.start(nextStartTimeRef.current);
-              nextStartTimeRef.current += audioBuffer.duration;
-              
-              scheduledSourcesRef.current.add(source);
-              source.onended = () => {
-                scheduledSourcesRef.current.delete(source);
-                if (scheduledSourcesRef.current.size === 0) {
-                  setAgentState('listening');
-                }
-              };
-            }
-
-            if (msg.serverContent?.interrupted) {
-              scheduledSourcesRef.current.forEach(s => {
-                try { s.stop(); } catch (e) {}
-              });
-              scheduledSourcesRef.current.clear();
-              if (audioContextRef.current) nextStartTimeRef.current = audioContextRef.current.currentTime;
-              setAgentState('listening');
-            }
-          },
-          onclose: () => stopAudio(),
-          onerror: (err) => {
-            console.error('Universal agent error:', err);
-            setError('Connection lost.');
-            stopAudio();
-          },
-        },
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
-          },
-          systemInstruction: `You are 'Kisan Mitra AI', an enthusiastic Indian Agricultural Expert on CropShield. You speak in ${getLanguageName()}. Be concise, friendly, and practical (1-2 sentences).`,
-        },
-      });
-
-      sessionPromiseRef.current = sessionPromise;
-    } catch (e) {
-      console.error(e);
-      setError('Could not connect to voice agent.');
-      setIsConnected(false);
-    }
-  };
-
+  // Handle open/close state transitions
   useEffect(() => {
-    if (isOpen) startSession();
-    else stopAudio();
-    return () => stopAudio();
-  }, [isOpen]);
+    if (isOpen) {
+      askAgent('Introduce yourself to the farmer briefly in 1 warm sentence.');
+    } else {
+      stopAll();
+    }
+  }, [isOpen, askAgent, stopAll]);
+
+  const handleTextSubmit = (e) => {
+    e.preventDefault();
+    if (!inputText.trim()) return;
+    const query = inputText.trim();
+    setInputText('');
+    setTranscript(query);
+    askAgent(query);
+  };
+
+  const quickPrompts = [
+    language === 'hi' ? 'गेहूं के लिए सबसे अच्छी खाद कौन सी है?' : 'Best fertilizer for wheat?',
+    language === 'hi' ? 'मिट्टी की जांच कैसे करें?' : 'How to test soil health?',
+    language === 'hi' ? 'कीटों से बचाव के उपाय?' : 'How to prevent crop pests?',
+  ];
 
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center gap-3 border-2 border-white/20 group"
+        className="fixed bottom-6 right-6 z-50 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center gap-3 border-2 border-white/20 group cursor-pointer"
+        aria-label="Open Kisan AI Advisor"
       >
         <div className="relative">
           <Sparkles className="w-6 h-6 animate-pulse" />
@@ -277,59 +92,197 @@ const UniversalAgent = () => {
   }
 
   return (
-    <div className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${isExpanded ? 'w-80 h-96' : 'w-72 h-20'}`}>
-      <div className="w-full h-full bg-stone-900/90 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col">
+    <aside
+      aria-label="Kisan Mitra Voice Advisor"
+      className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
+        isExpanded ? 'w-96 max-w-[92vw] h-[540px]' : 'w-72 h-16'
+      } flex flex-col shadow-2xl`}
+    >
+      <div className="relative flex-1 bg-stone-900/95 backdrop-blur-2xl rounded-3xl border border-emerald-500/30 text-white flex flex-col overflow-hidden shadow-emerald-950/40">
         {/* Header */}
-        <div className="p-4 bg-white/5 flex justify-between items-center border-b border-white/5">
-          <div className="flex items-center gap-2">
-            <Sprout className="w-5 h-5 text-emerald-400" />
-            <span className="text-sm font-bold text-white">Kisan Mitra Live</span>
+        <header className="p-4 bg-white/5 border-b border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div
+              className={`w-3 h-3 rounded-full ${
+                status === 'listening'
+                  ? 'bg-emerald-400 animate-ping'
+                  : status === 'speaking'
+                  ? 'bg-amber-400 animate-pulse'
+                  : 'bg-emerald-500'
+              }`}
+            />
+            <div>
+              <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                <Sprout size={16} className="text-emerald-400" />
+                Kisan Mitra Live Advisor
+              </h4>
+              <p className="text-[10px] text-emerald-300/80 font-medium capitalize">
+                {status === 'listening'
+                  ? '🎙️ Listening...'
+                  : status === 'thinking'
+                  ? '⚡ Consulting Gemini Voice...'
+                  : status === 'speaking'
+                  ? '🔊 Speaking (Gemini AI Voice)...'
+                  : 'Ready to help'}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={() => setIsExpanded(!isExpanded)} className="p-1 text-white/60 hover:text-white">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              title={isExpanded ? 'Minimize' : 'Expand'}
+            >
               <Minimize2 size={16} />
             </button>
-            <button onClick={() => setIsOpen(false)} className="p-1 text-white/60 hover:text-red-400">
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-1.5 text-stone-400 hover:text-red-400 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              title="Close"
+            >
               <X size={16} />
             </button>
           </div>
-        </div>
+        </header>
 
-        {isExpanded ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-6">
-            <div className="relative w-32 h-32 flex items-center justify-center">
-              <canvas ref={canvasRef} width={128} height={128} className="w-full h-full" />
-              <div className="absolute flex flex-col items-center pointer-events-none">
-                <span className="text-xs font-bold text-white capitalize">{agentState}</span>
-                <span className="text-[10px] text-emerald-400 font-semibold">{getLanguageName()}</span>
+        {isExpanded && (
+          <div className="flex-1 p-4 flex flex-col justify-between overflow-y-auto">
+            {/* Visualizer Circle */}
+            <div className="flex flex-col items-center justify-center my-2">
+              <div className="relative w-20 h-20 flex items-center justify-center">
+                <div
+                  className={`absolute inset-0 rounded-full bg-emerald-500/20 ${
+                    status === 'listening' || status === 'speaking' ? 'animate-ping duration-1000' : ''
+                  }`}
+                />
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center border-2 ${
+                    status === 'listening'
+                      ? 'border-emerald-400 bg-emerald-950/80 shadow-lg shadow-emerald-500/30'
+                      : status === 'speaking'
+                      ? 'border-amber-400 bg-amber-950/80 shadow-lg shadow-amber-500/30'
+                      : 'border-stone-700 bg-stone-800'
+                  }`}
+                >
+                  {status === 'speaking' ? (
+                    <Volume2 size={26} className="text-amber-400 animate-pulse" />
+                  ) : (
+                    <Bot size={26} className="text-emerald-400" />
+                  )}
+                </div>
               </div>
             </div>
 
-            {error && <p className="text-xs text-red-400 text-center mt-2">{error}</p>}
-
-            <div className="mt-6 flex items-center gap-4">
-              <button
-                onClick={() => setIsMuted(!isMuted)}
-                className={`p-3 rounded-2xl transition-all ${isMuted ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white'}`}
-              >
-                {isMuted ? <MicOff size={18} /> : <Mic size={18} />}
-              </button>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl font-bold flex items-center gap-2 text-sm shadow-lg shadow-red-500/30"
-              >
-                <PhoneOff size={16} /> End
-              </button>
+            {/* Conversation Messages */}
+            <div className="space-y-2.5 my-2 text-xs flex-1 overflow-y-auto max-h-[160px] pr-1">
+              {transcript && (
+                <div className="flex items-start gap-2 bg-white/5 p-2.5 rounded-2xl border border-white/5 text-stone-200">
+                  <User size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <p className="italic">"{transcript}"</p>
+                </div>
+              )}
+              {reply && (
+                <div className="flex items-start gap-2 bg-emerald-950/40 p-3 rounded-2xl border border-emerald-500/20 text-emerald-100 leading-relaxed">
+                  <Bot size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <p>{reply}</p>
+                </div>
+              )}
+              {error && (
+                <p className="text-[11px] text-amber-300 text-center bg-amber-950/40 p-2 rounded-xl border border-amber-500/20">
+                  {error}
+                </p>
+              )}
             </div>
+
+            {/* Quick Prompts */}
+            <div className="my-1.5">
+              <p className="text-[10px] text-stone-400 font-semibold mb-1">Quick prompts:</p>
+              <div className="flex flex-wrap gap-1">
+                {quickPrompts.map((prompt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setTranscript(prompt);
+                      askAgent(prompt);
+                    }}
+                    className="text-[11px] px-2.5 py-1 bg-stone-800 hover:bg-emerald-900/60 hover:border-emerald-500/40 border border-stone-700 rounded-full text-stone-300 hover:text-white transition-all text-left cursor-pointer"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Dual Input Form: Text Box + Mic + Mute + Close */}
+            <form onSubmit={handleTextSubmit} className="pt-2.5 border-t border-white/10 flex items-center gap-1.5">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder={language === 'hi' ? 'प्रश्न यहाँ लिखें या माइक दबाएं...' : 'Type question or tap mic...'}
+                className="flex-1 bg-stone-800/90 border border-stone-700 rounded-xl px-3 py-2 text-xs text-white placeholder-stone-400 focus:outline-none focus:border-emerald-500"
+              />
+
+              <button
+                type="button"
+                onClick={() => (status === 'listening' ? stopListening() : startListening())}
+                className={`p-2 rounded-xl transition-all shadow-md cursor-pointer ${
+                  status === 'listening'
+                    ? 'bg-amber-500 text-stone-950 animate-pulse'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                }`}
+                title={status === 'listening' ? 'Stop Listening' : 'Tap to Speak'}
+              >
+                <Mic size={15} />
+              </button>
+
+              <button
+                type="submit"
+                disabled={!inputText.trim()}
+                className="p-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-30 text-white rounded-xl transition-colors shadow-md cursor-pointer"
+                title="Send"
+              >
+                <Send size={15} />
+              </button>
+
+              <button
+                type="button"
+                onClick={toggleMute}
+                className={`p-2 rounded-xl border transition-colors cursor-pointer ${
+                  isMuted
+                    ? 'bg-red-500/20 border-red-500/40 text-red-300'
+                    : 'bg-stone-800 border-stone-700 text-stone-300 hover:text-white'
+                }`}
+                title={isMuted ? 'Unmute' : 'Mute'}
+              >
+                {isMuted ? <MicOff size={15} /> : <Volume2 size={15} />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-2 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-colors shadow-md cursor-pointer"
+                title="End"
+              >
+                <PhoneOff size={15} />
+              </button>
+            </form>
           </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-between px-4">
-            <span className="text-xs text-emerald-400 font-bold capitalize">Live • {agentState}</span>
-            <button onClick={() => setIsExpanded(true)} className="text-xs text-white underline">Expand</button>
+        )}
+
+        {!isExpanded && (
+          <div className="flex-1 px-4 flex items-center justify-between">
+            <span className="text-xs font-semibold text-emerald-400 capitalize">Kisan Mitra: {status}</span>
+            <button
+              onClick={() => setIsExpanded(true)}
+              className="text-xs text-stone-300 hover:text-white underline cursor-pointer"
+            >
+              Expand
+            </button>
           </div>
         )}
       </div>
-    </div>
+    </aside>
   );
 };
 

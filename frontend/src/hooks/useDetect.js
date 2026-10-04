@@ -4,13 +4,19 @@ import { fetchWeather } from './useWeather';
 import { useAuth } from './useAuth';
 import { useLanguage } from './useLanguage';
 
+/**
+ * Custom hook for crop disease visual diagnosis workflow,
+ * handling image upload, camera capture, demo presets, AI inference, and history logging.
+ *
+ * @returns {object} Detection state, refs, and action handlers
+ */
 export const useDetect = () => {
   const { isAuthenticated, addToHistory } = useAuth();
   const { language, t } = useLanguage();
 
   const [image, setImage] = useState(null);
   const [demoType, setDemoType] = useState(null);
-  const [status, setStatus] = useState('IDLE');
+  const [status, setStatus] = useState('IDLE'); // 'IDLE' | 'ANALYZING_IMAGE' | 'GENERATING_PLAN' | 'SUCCESS' | 'ERROR'
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -18,9 +24,12 @@ export const useDetect = () => {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
+  /**
+   * Processes and validates an uploaded image file
+   */
   const processFile = (file) => {
     if (!file.type.startsWith('image/')) {
-      setError(t('detect.error.img'));
+      setError(t('detect.error.img') || 'Please upload a valid image file.');
       return;
     }
     setDemoType(null); // Custom user upload -> Live Gemini
@@ -37,6 +46,9 @@ export const useDetect = () => {
     if (file) processFile(file);
   };
 
+  /**
+   * Handles selecting a pre-curated demo crop leaf image
+   */
   const handleDemoSelect = async (e) => {
     const url = e.target.value;
     if (!url) {
@@ -64,7 +76,7 @@ export const useDetect = () => {
         resetState();
       };
       reader.readAsDataURL(blob);
-    } catch (err) {
+    } catch (_) {
       setError('Demo sample failed to load.');
     }
   };
@@ -83,6 +95,9 @@ export const useDetect = () => {
     }
   };
 
+  /**
+   * Triggers the full plant pathology AI diagnosis pipeline
+   */
   const analyzeImage = async () => {
     if (!image) return;
 
@@ -93,17 +108,17 @@ export const useDetect = () => {
       // Fetch weather in background while calling detection
       const weatherPromise = fetchWeather(language);
 
-      // Step 1: Detect Crop & Pest via Backend AI route (passes demoType for instant response)
+      // Step 1: Detect Crop & Pest via Backend AI route
       const detectRes = await aiApi.detectCrop(image, demoType);
       const identification = detectRes.identification;
 
       if (!identification || identification.pest_label?.toLowerCase() === 'unknown' || identification.confidence < 0.4) {
-        setError(t('detect.error.id'));
+        setError(t('detect.error.id') || 'Unable to identify crop condition. Please try a clearer photo.');
         setStatus('ERROR');
         return;
       }
 
-      // Step 2: Treatment plan
+      // Step 2: Treatment plan generation
       setStatus('GENERATING_PLAN');
       const weatherData = await weatherPromise;
 
@@ -123,13 +138,13 @@ export const useDetect = () => {
       setResult(analysisResult);
       setStatus('SUCCESS');
 
-      // Auto-save to history
+      // Auto-save to farmer scan history if authenticated
       if (isAuthenticated) {
         addToHistory({
           crop: identification.crop,
           pest: identification.pest_label,
           confidence: identification.confidence,
-          severity: treatRes.treatment.severity,
+          severity: treatRes.treatment?.severity || 'medium',
           imagePreview: image,
           fullAnalysis: analysisResult,
         });
@@ -142,7 +157,7 @@ export const useDetect = () => {
       }, 300);
 
     } catch (err) {
-      console.error('Detection error:', err);
+      console.error('[useDetect] Detection error:', err);
       setError(err?.message || 'Analysis failed. Please check backend connection.');
       setStatus('ERROR');
     }
@@ -165,3 +180,5 @@ export const useDetect = () => {
     analyzeImage,
   };
 };
+
+export default useDetect;

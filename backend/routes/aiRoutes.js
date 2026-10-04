@@ -5,6 +5,7 @@ import {
   generateAudioTTS,
   generateYieldOptimization,
   askQuestion,
+  askVoiceAdvisor,
 } from '../controllers/aiController.js';
 import { upload } from '../middlewares/uploadMiddleware.js';
 import { optionalAuth } from '../middlewares/authMiddleware.js';
@@ -17,5 +18,6 @@ router.post('/treatment-plan', generateTreatment);
 router.post('/audio-tts', generateAudioTTS);
 router.post('/yield-plan', generateYieldOptimization);
 router.post('/ask', askQuestion);
+router.post('/ask-voice', askVoiceAdvisor);
 
 export default router;
