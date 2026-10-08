@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const translations = {
   en: {
@@ -14,7 +14,8 @@ const translations = {
     "hero.badge": "AI-Powered Crop Protection",
     "hero.title.1": "Your Pocket",
     "hero.title.2": "Agronomist.",
-    "hero.subtitle": "Diagnose crop diseases, get weather-smart treatments, and protect your yield—all from a single photo.",
+    "hero.subtitle":
+      "Diagnose crop diseases, get weather-smart treatments, and protect your yield all from a single photo.",
     "hero.cta.detect": "Detect Disease",
     "hero.cta.demo": "Watch Demo",
     "hero.stat.accuracy": "Accuracy",
@@ -24,17 +25,23 @@ const translations = {
     "feat.weather": "Weather Sync",
     "feat.protect": "Crop Protection",
     "why.title": "Why Farmers Trust Us",
-    "why.subtitle": "We combine advanced AI with local farming wisdom to give you the best of both worlds.",
+    "why.subtitle":
+      "We combine advanced AI with local farming wisdom to give you the best of both worlds.",
     "why.1.title": "Local Language Support",
-    "why.1.desc": "We speak your language. Get diagnosis and advice in Hindi, Bengali, or English instantly.",
+    "why.1.desc":
+      "We speak your language. Get diagnosis and advice in Hindi, Bengali, or English instantly.",
     "why.2.title": "Works Offline",
-    "why.2.desc": "No internet in the field? No problem. Our app caches results and works on low bandwidth.",
+    "why.2.desc":
+      "No internet in the field? No problem. Our app caches results and works on low bandwidth.",
     "why.3.title": "Zero Cost",
-    "why.3.desc": "Completely free for smallholder farmers. We believe technology should be accessible to all.",
+    "why.3.desc":
+      "Completely free for smallholder farmers. We believe technology should be accessible to all.",
     "why.4.title": "Genuine Products",
-    "why.4.desc": "We connect you to verified sellers so you never buy fake medicines again.",
+    "why.4.desc":
+      "We connect you to verified sellers so you never buy fake medicines again.",
     "trust.title": "Trusted by the Community",
-    "trust.1.quote": "Saved my potato crop from blight. The audio guide is very helpful.",
+    "trust.1.quote":
+      "Saved my potato crop from blight. The audio guide is very helpful.",
     "trust.1.name": "Rajesh Kumar",
     "trust.1.loc": "Bihar",
     "trust.2.quote": "I like that it tells me when to spray based on the rain.",
@@ -45,14 +52,18 @@ const translations = {
     "trust.3.loc": "West Bengal",
     "faq.title": "Frequently Asked Questions",
     "faq.1.q": "Is this app really free?",
-    "faq.1.a": "Yes, CropShield is 100% free for farmers to diagnose diseases and get advice.",
+    "faq.1.a":
+      "Yes, CropShield is 100% free for farmers to diagnose diseases and get advice.",
     "faq.2.q": "Does it work without internet?",
-    "faq.2.a": "The app is optimized for 2G/3G. Once loaded, you can view past reports offline.",
+    "faq.2.a":
+      "The app is optimized for 2G/3G. Once loaded, you can view past reports offline.",
     "faq.3.q": "How accurate is the AI?",
-    "faq.3.a": "Our AI is trained on over 50,000 crop images and has a 98% accuracy rate.",
+    "faq.3.a":
+      "Our AI is trained on over 50,000 crop images and has a 98% accuracy rate.",
     "detect.lab_title": "AI Laboratory",
     "detect.title": "Farmer's Assistant",
-    "detect.subtitle": "Upload a photo or take a picture. Get advice in your language.",
+    "detect.subtitle":
+      "Upload a photo or take a picture. Get advice in your language.",
     "detect.upload": "Upload Crop Photo",
     "detect.drag": "Drag & drop or choose an option below",
     "detect.drop": "Drop image here",
@@ -64,13 +75,16 @@ const translations = {
     "detect.btn.consulting": "Consulting Expert...",
     "detect.btn.again": "Analyze Another",
     "detect.error.img": "Please upload a valid image file.",
-    "detect.error.id": "Could not identify crop. Please ensure the photo is clear.",
+    "detect.error.id":
+      "Could not identify crop. Please ensure the photo is clear.",
     "detect.sample": "Or Use Sample",
     "detect.history_title": "Track Your Field History",
-    "detect.history_sub": "Join 50k+ farmers to save reports and monitor farm growth.",
+    "detect.history_sub":
+      "Join 50k+ farmers to save reports and monitor farm growth.",
     "detect.signup_now": "Sign Up Now",
     "detect.promo.save": "Save your field reports",
-    "detect.promo.desc": "Create a free account to track disease history and get alerts.",
+    "detect.promo.desc":
+      "Create a free account to track disease history and get alerts.",
     "detect.promo.btn": "Sign Up Free",
     "result.report_header": "Field Report",
     "result.confidence": "Confidence",
@@ -136,11 +150,13 @@ const translations = {
     "profile.view": "View Report",
     "profile.match": "Match",
     "soil.title": "Digital Soil Laboratory",
-    "soil.subtitle": "Scientific analysis using Satellite Data, Computer Vision, and OCR.",
+    "soil.subtitle":
+      "Scientific analysis using Satellite Data, Computer Vision, and OCR.",
     "soil.tab.satellite": "Satellite Data",
     "soil.tab.vision": "Visual Doctor",
     "soil.tab.ocr": "Health Card",
-    "soil.sat.desc": "We use Open-Meteo and ISRIC data layers to estimate soil moisture, temperature, and pH based on your GPS location.",
+    "soil.sat.desc":
+      "We use Open-Meteo and ISRIC data layers to estimate soil moisture, temperature, and pH based on your GPS location.",
     "soil.btn.fetch": "Fetch Satellite Data",
     "soil.label.moisture": "MOISTURE",
     "soil.label.temp": "TEMP",
@@ -155,9 +171,11 @@ const translations = {
     "soil.res.org": "ORGANIC CARBON",
     "soil.res.def": "Deficiencies",
     "soil.res.rec": "Recommendations",
-    "soil.res.empty": "Select a method and start analysis to see the Soil Health Report.",
+    "soil.res.empty":
+      "Select a method and start analysis to see the Soil Health Report.",
     "yield.title": "Yield Master",
-    "yield.subtitle": "AI-generated strategic production plans to maximize your harvest.",
+    "yield.subtitle":
+      "AI-generated strategic production plans to maximize your harvest.",
     "yield.config_title": "Farm Configuration",
     "yield.label.crop": "Target Crop",
     "yield.label.land": "Land Size (Acres)",
@@ -169,16 +187,19 @@ const translations = {
     "yield.res.fert": "Fertilizer",
     "yield.empty": "Enter details to generate your Yield Plan",
     "expert.title": "Kisan Sahayak Network",
-    "expert.subtitle": "Connect with top agronomists or volunteer to help farmers.",
+    "expert.subtitle":
+      "Connect with top agronomists or volunteer to help farmers.",
     "expert.tab.find": "Find an Expert",
     "expert.tab.volunteer": "Volunteer as Expert",
     "expert.btn.profile": "View Profile",
     "expert.btn.call": "Video Call",
     "expert.btn.busy": "Busy",
     "expert.verified_title": "100% Verified Experts",
-    "expert.verified_desc": "All our agronomists are verified by top agricultural universities.",
+    "expert.verified_desc":
+      "All our agronomists are verified by top agricultural universities.",
     "expert.vol.title": "Join the Mission",
-    "expert.vol.subtitle": "Are you an agriculture student? Help farmers and gain real-world experience.",
+    "expert.vol.subtitle":
+      "Are you an agriculture student? Help farmers and gain real-world experience.",
     "expert.vol.name": "Full Name",
     "expert.vol.uni": "University / College",
     "expert.vol.year": "Year of Study",
@@ -187,7 +208,8 @@ const translations = {
     "expert.vol.upload": "Click to upload ID card",
     "expert.vol.submit": "Submit Application",
     "expert.vol.success_title": "Application Submitted!",
-    "expert.vol.success_desc": "Thank you for volunteering. We will review your application and contact you within 24 hours."
+    "expert.vol.success_desc":
+      "Thank you for volunteering. We will review your application and contact you within 24 hours.",
   },
   hi: {
     "nav.home": "होम",
@@ -202,7 +224,8 @@ const translations = {
     "hero.badge": "एआई-संचालित फसल सुरक्षा",
     "hero.title.1": "आपका डिजिटल",
     "hero.title.2": "कृषि मित्र",
-    "hero.subtitle": "फसल रोगों की पहचान करें, मौसम-आधारित उपचार प्राप्त करें और अपनी पैदावार बचाएं—सिर्फ एक फोटो से।",
+    "hero.subtitle":
+      "फसल रोगों की पहचान करें, मौसम-आधारित उपचार प्राप्त करें और अपनी पैदावार बचाएं सिर्फ एक फोटो से।",
     "hero.cta.detect": "अभी जाँच करें",
     "hero.cta.demo": "डेमो देखें",
     "hero.stat.accuracy": "सटीकता",
@@ -212,20 +235,26 @@ const translations = {
     "feat.weather": "मौसम जानकारी",
     "feat.protect": "फसल सुरक्षा",
     "why.title": "किसान हम पर भरोसा क्यों करते हैं",
-    "why.subtitle": "हम आपकी खेती में आधुनिक तकनीक और देसी समझ दोनों को जोड़ते हैं।",
+    "why.subtitle":
+      "हम आपकी खेती में आधुनिक तकनीक और देसी समझ दोनों को जोड़ते हैं।",
     "why.1.title": "आपकी अपनी भाषा",
-    "why.1.desc": "हम आपकी भाषा समझते हैं। हिंदी, बांग्ला या अंग्रेजी में तुरंत सलाह पाएं।",
+    "why.1.desc":
+      "हम आपकी भाषा समझते हैं। हिंदी, बांग्ला या अंग्रेजी में तुरंत सलाह पाएं।",
     "why.2.title": "बिना इंटरनेट काम करे",
-    "why.2.desc": "खेत में नेट नहीं? कोई बात नहीं। कम नेटवर्क में भी ऐप अच्छा चलता है।",
+    "why.2.desc":
+      "खेत में नेट नहीं? कोई बात नहीं। कम नेटवर्क में भी ऐप अच्छा चलता है।",
     "why.3.title": "बिलकुल मुफ्त",
     "why.3.desc": "छोटे किसानों के लिए यह सेवा मुफ्त है। तकनीक पर सबका हक है।",
     "why.4.title": "असली दवाएं",
-    "why.4.desc": "हम आपको सही दुकानदारों से जोड़ते हैं ताकि आप नकली दवाओं से बचें।",
+    "why.4.desc":
+      "हम आपको सही दुकानदारों से जोड़ते हैं ताकि आप नकली दवाओं से बचें।",
     "trust.title": "समुदाय का भरोसा",
-    "trust.1.quote": "मेरी आलू की फसल को झुलसा रोग से बचाया। ऑडियो गाइड बहुत काम की है।",
+    "trust.1.quote":
+      "मेरी आलू की फसल को झुलसा रोग से बचाया। ऑडियो गाइड बहुत काम की है।",
     "trust.1.name": "राजेश कुमार",
     "trust.1.loc": "बिहार",
-    "trust.2.quote": "मुझे यह पसंद है कि यह बारिश देखकर छिड़काव का समय बताता है।",
+    "trust.2.quote":
+      "मुझे यह पसंद है कि यह बारिश देखकर छिड़काव का समय बताता है।",
     "trust.2.name": "सुनीता देवी",
     "trust.2.loc": "उत्तर प्रदेश",
     "trust.3.quote": "आखिरकार एक ऐप जो सही हिंदी बोलता है!",
@@ -233,14 +262,18 @@ const translations = {
     "trust.3.loc": "पश्चिम बंगाल",
     "faq.title": "अक्सर पूछे जाने वाले सवाल",
     "faq.1.q": "क्या यह ऐप सचमुच मुफ्त है?",
-    "faq.1.a": "जी हाँ, क्रॉपशील्ड किसानों के लिए बीमारी पहचानने और सलाह लेने के लिए 100% मुफ्त है।",
+    "faq.1.a":
+      "जी हाँ, क्रॉपशील्ड किसानों के लिए बीमारी पहचानने और सलाह लेने के लिए 100% मुफ्त है।",
     "faq.2.q": "क्या यह बिना इंटरनेट के चलता है?",
-    "faq.2.a": "यह ऐप 2G/3G के लिए बना है। एक बार लोड होने पर आप पुरानी रिपोर्ट देख सकते हैं।",
+    "faq.2.a":
+      "यह ऐप 2G/3G के लिए बना है। एक बार लोड होने पर आप पुरानी रिपोर्ट देख सकते हैं।",
     "faq.3.q": "एआई कितना सटीक है?",
-    "faq.3.a": "हमारा एआई 50,000 से ज्यादा तस्वीरों पर सीखा है और 98% सही जवाब देता है।",
+    "faq.3.a":
+      "हमारा एआई 50,000 से ज्यादा तस्वीरों पर सीखा है और 98% सही जवाब देता है।",
     "detect.lab_title": "एआई लैब",
     "detect.title": "किसान सहायक",
-    "detect.subtitle": "फोटो अपलोड करें या तस्वीर लें। अपनी भाषा में सलाह प्राप्त करें।",
+    "detect.subtitle":
+      "फोटो अपलोड करें या तस्वीर लें। अपनी भाषा में सलाह प्राप्त करें।",
     "detect.upload": "फोटो अपलोड करें",
     "detect.drag": "फोटो यहाँ डालें या नीचे से चुनें",
     "detect.drop": "फोटो यहाँ छोड़ें",
@@ -258,7 +291,8 @@ const translations = {
     "detect.history_sub": "रिपोर्ट सहेजने के लिए 50k+ किसानों से जुड़ें।",
     "detect.signup_now": "अभी रजिस्टर करें",
     "detect.promo.save": "अपनी रिपोर्ट सेव करें",
-    "detect.promo.desc": "बीमारी का इतिहास रखने और अलर्ट पाने के लिए मुफ्त खाता बनाएं।",
+    "detect.promo.desc":
+      "बीमारी का इतिहास रखने और अलर्ट पाने के लिए मुफ्त खाता बनाएं।",
     "detect.promo.btn": "मुफ्त साइन अप",
     "result.report_header": "क्षेत्र रिपोर्ट",
     "result.confidence": "सटीकता",
@@ -324,11 +358,13 @@ const translations = {
     "profile.view": "रिपोर्ट देखें",
     "profile.match": "मिलान",
     "soil.title": "डिजिटल मिट्टी लैब",
-    "soil.subtitle": "सैटेलाइट डेटा, कंप्यूटर विज़न और ओसीआर का उपयोग करके वैज्ञानिक विश्लेषण।",
+    "soil.subtitle":
+      "सैटेलाइट डेटा, कंप्यूटर विज़न और ओसीआर का उपयोग करके वैज्ञानिक विश्लेषण।",
     "soil.tab.satellite": "सैटेलाइट डेटा",
     "soil.tab.vision": "विजुअल डॉक्टर",
     "soil.tab.ocr": "हेल्थ कार्ड",
-    "soil.sat.desc": "हम आपके जीपीएस स्थान के आधार पर मिट्टी की नमी, तापमान और पीएच का अनुमान लगाने के लिए ओपन-मेटियो और ISRIC डेटा का उपयोग करते हैं।",
+    "soil.sat.desc":
+      "हम आपके जीपीएस स्थान के आधार पर मिट्टी की नमी, तापमान और पीएच का अनुमान लगाने के लिए ओपन-मेटियो और ISRIC डेटा का उपयोग करते हैं।",
     "soil.btn.fetch": "सैटेलाइट डेटा लाएं",
     "soil.label.moisture": "नमी",
     "soil.label.temp": "तापमान",
@@ -343,9 +379,11 @@ const translations = {
     "soil.res.org": "जैविक कार्बन",
     "soil.res.def": "कमियाँ",
     "soil.res.rec": "सुझाव",
-    "soil.res.empty": "मिट्टी की स्वास्थ्य रिपोर्ट देखने के लिए एक विधि चुनें और विश्लेषण शुरू करें।",
+    "soil.res.empty":
+      "मिट्टी की स्वास्थ्य रिपोर्ट देखने के लिए एक विधि चुनें और विश्लेषण शुरू करें।",
     "yield.title": "यीड मास्टर (पैदावार)",
-    "yield.subtitle": "अपनी फसल को अधिकतम करने के लिए एआई-जनरेटेड उत्पादन योजनाएं।",
+    "yield.subtitle":
+      "अपनी फसल को अधिकतम करने के लिए एआई-जनरेटेड उत्पादन योजनाएं।",
     "yield.config_title": "खेत का कॉन्फ़िगरेशन",
     "yield.label.crop": "लक्षित फसल",
     "yield.label.land": "भूमि का आकार (एकड़)",
@@ -364,9 +402,11 @@ const translations = {
     "expert.btn.call": "वीडियो कॉल",
     "expert.btn.busy": "व्यस्त",
     "expert.verified_title": "100% सत्यापित विशेषज्ञ",
-    "expert.verified_desc": "हमारे सभी कृषि विशेषज्ञ शीर्ष विश्वविद्यालयों द्वारा सत्यापित हैं।",
+    "expert.verified_desc":
+      "हमारे सभी कृषि विशेषज्ञ शीर्ष विश्वविद्यालयों द्वारा सत्यापित हैं।",
     "expert.vol.title": "मिशन में शामिल हों",
-    "expert.vol.subtitle": "क्या आप कृषि छात्र हैं? किसानों की मदद करें और अनुभव प्राप्त करें।",
+    "expert.vol.subtitle":
+      "क्या आप कृषि छात्र हैं? किसानों की मदद करें और अनुभव प्राप्त करें।",
     "expert.vol.name": "पूरा नाम",
     "expert.vol.uni": "विश्वविद्यालय / कॉलेज",
     "expert.vol.year": "अध्ययन का वर्ष",
@@ -375,7 +415,8 @@ const translations = {
     "expert.vol.upload": "आईडी कार्ड अपलोड करने के लिए क्लिक करें",
     "expert.vol.submit": "आवेदन जमा करें",
     "expert.vol.success_title": "आवेदन जमा हो गया!",
-    "expert.vol.success_desc": "स्वयंसेवा के लिए धन्यवाद। हम आपके आवेदन की समीक्षा करेंगे और 24 घंटे के भीतर संपर्क करेंगे।"
+    "expert.vol.success_desc":
+      "स्वयंसेवा के लिए धन्यवाद। हम आपके आवेदन की समीक्षा करेंगे और 24 घंटे के भीतर संपर्क करेंगे।",
   },
   bn: {
     "nav.home": "হোম",
@@ -390,7 +431,8 @@ const translations = {
     "hero.badge": "এআই-চালিত শস্য সুরক্ষা",
     "hero.title.1": "আপনার পকেটে",
     "hero.title.2": "কৃষি বিশেষজ্ঞ",
-    "hero.subtitle": "ফসলের রোগ নির্ণয় করুন এবং আপনার ফলন রক্ষা করুন—শুধুমাত্র একটি ছবি দিয়ে।",
+    "hero.subtitle":
+      "ফসলের রোগ নির্ণয় করুন এবং আপনার ফলন রক্ষা করুন শুধুমাত্র একটি ছবি দিয়ে।",
     "hero.cta.detect": "রোগ শনাক্ত করুন",
     "hero.cta.demo": "ডেমো দেখুন",
     "hero.stat.accuracy": "নির্ভুলতা",
@@ -400,20 +442,27 @@ const translations = {
     "feat.weather": "আবহাওয়ার তথ্য",
     "feat.protect": "ফসল সুরক্ষা",
     "why.title": "কৃষকরা কেন আমাদের বিশ্বাস করেন",
-    "why.subtitle": "আমরা আধুনিক প্রযুক্তির সাথে স্থানীয় চাষাবাদের অভিজ্ঞতাকে যুক্ত করি।",
+    "why.subtitle":
+      "আমরা আধুনিক প্রযুক্তির সাথে স্থানীয় চাষাবাদের অভিজ্ঞতাকে যুক্ত করি।",
     "why.1.title": "আপনার নিজের ভাষা",
-    "why.1.desc": "আমরা আপনার ভাষা বুঝি। বাংলা, হিন্দি বা ইংরেজিতে তাৎক্ষণিক পরামর্শ পান।",
+    "why.1.desc":
+      "আমরা আপনার ভাষা বুঝি। বাংলা, হিন্দি বা ইংরেজিতে তাৎক্ষণিক পরামর্শ পান।",
     "why.2.title": "ইন্টারনেট ছাড়াও চলে",
-    "why.2.desc": "মাঠে নেট নেই? সমস্যা নেই। কম নেটওয়ার্ক স্পিডেও আমাদের অ্যাপ ভালো কাজ করে।",
+    "why.2.desc":
+      "মাঠে নেট নেই? সমস্যা নেই। কম নেটওয়ার্ক স্পিডেও আমাদের অ্যাপ ভালো কাজ করে।",
     "why.3.title": "সম্পূর্ণ বিনামূল্যে",
-    "why.3.desc": "ক্ষুদ্র কৃষকদের জন্য এই সেবা সম্পূর্ণ ফ্রি। প্রযুক্তিতে সবার অধিকার আছে।",
+    "why.3.desc":
+      "ক্ষুদ্র কৃষকদের জন্য এই সেবা সম্পূর্ণ ফ্রি। প্রযুক্তিতে সবার অধিকার আছে।",
     "why.4.title": "আসল ওষুধ",
-    "why.4.desc": "আমরা আপনাকে সঠিক বিক্রেতাদের সাথে সংযুক্ত করি যাতে আপনি নকল ওষুধ কেনা থেকে বাঁচেন।",
+    "why.4.desc":
+      "আমরা আপনাকে সঠিক বিক্রেতাদের সাথে সংযুক্ত করি যাতে আপনি নকল ওষুধ কেনা থেকে বাঁচেন।",
     "trust.title": "কমিউনিটির বিশ্বাস",
-    "trust.1.quote": "আমার আলুর ফসলকে ধসা রোগ থেকে বাঁচিয়েছে। অডিও গাইডটি খুব কাজের।",
+    "trust.1.quote":
+      "আমার আলুর ফসলকে ধসা রোগ থেকে বাঁচিয়েছে। অডিও গাইডটি খুব কাজের।",
     "trust.1.name": "রাজেশ কুমার",
     "trust.1.loc": "বিহার",
-    "trust.2.quote": "বৃষ্টির সম্ভাবনা দেখে স্প্রে করার সময় বলে দেয়, এটা আমার খুব ভালো লাগে।",
+    "trust.2.quote":
+      "বৃষ্টির সম্ভাবনা দেখে স্প্রে করার সময় বলে দেয়, এটা আমার খুব ভালো লাগে।",
     "trust.2.name": "সুনিতা দেবী",
     "trust.2.loc": "উত্তর প্রদেশ",
     "trust.3.quote": "অবশেষে এমন একটা অ্যাপ যা সঠিকভাবে বাংলা বলে!",
@@ -421,11 +470,14 @@ const translations = {
     "trust.3.loc": "পশ্চিমবঙ্গ",
     "faq.title": "সাধারণ জিজ্ঞাসা",
     "faq.1.q": "এই অ্যাপটি কি সত্যিই ফ্রি?",
-    "faq.1.a": "হ্যাঁ, ক্রপশিল্ড কৃষকদের রোগ নির্ণয় এবং পরামর্শের জন্য ১০০% বিনামূল্যে।",
+    "faq.1.a":
+      "হ্যাঁ, ক্রপশিল্ড কৃষকদের রোগ নির্ণয় এবং পরামর্শের জন্য ১০০% বিনামূল্যে।",
     "faq.2.q": "এটি কি ইন্টারনেট ছাড়া কাজ করে?",
-    "faq.2.a": "অ্যাপটি 2G/3G এর জন্য তৈরি। একবার লোড হলে আপনি অফলাইনে রিপোর্ট দেখতে পারবেন।",
+    "faq.2.a":
+      "অ্যাপটি 2G/3G এর জন্য তৈরি। একবার লোড হলে আপনি অফলাইনে রিপোর্ট দেখতে পারবেন।",
     "faq.3.q": "এআই কতটা নির্ভুল?",
-    "faq.3.a": "আমাদের এআই ৫০,০০০+ ছবির উপর প্রশিক্ষিত এবং ৯৮% সঠিক উত্তর দেয়।",
+    "faq.3.a":
+      "আমাদের এআই ৫০,০০০+ ছবির উপর প্রশিক্ষিত এবং ৯৮% সঠিক উত্তর দেয়।",
     "detect.lab_title": "এআই ল্যাব",
     "detect.title": "কৃষক সহকারী",
     "detect.subtitle": "ছবি আপলোড করুন বা তুলুন। আপনার ভাষায় পরামর্শ নিন।",
@@ -446,7 +498,8 @@ const translations = {
     "detect.history_sub": "রিপোর্ট সেভ করতে ৫০ হাজার কৃষকের সাথে যোগ দিন।",
     "detect.signup_now": "এখনই সাইন আপ করুন",
     "detect.promo.save": "রিপোর্ট সেভ করুন",
-    "detect.promo.desc": "রোগের ইতিহাস রাখতে এবং অ্যালার্ট পেতে ফ্রি অ্যাকাউন্ট খুলুন।",
+    "detect.promo.desc":
+      "রোগের ইতিহাস রাখতে এবং অ্যালার্ট পেতে ফ্রি অ্যাকাউন্ট খুলুন।",
     "detect.promo.btn": "ফ্রি সাইন আপ",
     "result.report_header": "মাঠের রিপোর্ট",
     "result.confidence": "সঠিকতা",
@@ -512,11 +565,13 @@ const translations = {
     "profile.view": "রিপোর্ট দেখুন",
     "profile.match": "মিল",
     "soil.title": "ডিজিটাল মাটি ল্যাব",
-    "soil.subtitle": "স্যাটেলাইট ডেটা, কম্পিউটার ভিশন এবং ওসিআর ব্যবহার করে বৈজ্ঞানিক বিশ্লেষণ।",
+    "soil.subtitle":
+      "স্যাটেলাইট ডেটা, কম্পিউটার ভিশন এবং ওসিআর ব্যবহার করে বৈজ্ঞানিক বিশ্লেষণ।",
     "soil.tab.satellite": "স্যাটেলাইট ডেটা",
     "soil.tab.vision": "ভিজ্যুয়াল ডাক্তার",
     "soil.tab.ocr": "হেলথ কার্ড",
-    "soil.sat.desc": "আমরা আপনার জিপিএস অবস্থানের উপর ভিত্তি করে মাটির আর্দ্রতা, তাপমাত্রা এবং পিএইচ অনুমান করতে ওপেন-মেটিও এবং ISRIC ডেটা ব্যবহার করি।",
+    "soil.sat.desc":
+      "আমরা আপনার জিপিএস অবস্থানের উপর ভিত্তি করে মাটির আর্দ্রতা, তাপমাত্রা এবং পিএইচ অনুমান করতে ওপেন-মেটিও এবং ISRIC ডেটা ব্যবহার করি।",
     "soil.btn.fetch": "স্যাটেলাইট তথ্য নিন",
     "soil.label.moisture": "আর্দ্রতা",
     "soil.label.temp": "তাপমাত্রা",
@@ -531,7 +586,8 @@ const translations = {
     "soil.res.org": "জৈব কার্বন",
     "soil.res.def": "ঘাটতি",
     "soil.res.rec": "সুপারিশ",
-    "soil.res.empty": "মাটির স্বাস্থ্য রিপোর্ট দেখতে একটি পদ্ধতি নির্বাচন করুন এবং বিশ্লেষণ শুরু করুন।",
+    "soil.res.empty":
+      "মাটির স্বাস্থ্য রিপোর্ট দেখতে একটি পদ্ধতি নির্বাচন করুন এবং বিশ্লেষণ শুরু করুন।",
     "yield.title": "ইল্ড মাস্টার (ফলন)",
     "yield.subtitle": "আপনার ফলন বাড়ানোর জন্য এআই-জেনারেটেড উৎপাদন পরিকল্পনা।",
     "yield.config_title": "খামারের কনফিগারেশন",
@@ -552,9 +608,11 @@ const translations = {
     "expert.btn.call": "ভিডিও কল",
     "expert.btn.busy": "ব্যস্ত",
     "expert.verified_title": "১০০% যাচাইকৃত বিশেষজ্ঞ",
-    "expert.verified_desc": "আমাদের সমস্ত কৃষি বিশেষজ্ঞ শীর্ষ বিশ্ববিদ্যালয় দ্বারা যাচাইকৃত।",
+    "expert.verified_desc":
+      "আমাদের সমস্ত কৃষি বিশেষজ্ঞ শীর্ষ বিশ্ববিদ্যালয় দ্বারা যাচাইকৃত।",
     "expert.vol.title": "মিশনে যোগ দিন",
-    "expert.vol.subtitle": "আপনি কি কৃষি ছাত্র? কৃষকদের সাহায্য করুন এবং অভিজ্ঞতা অর্জন করুন।",
+    "expert.vol.subtitle":
+      "আপনি কি কৃষি ছাত্র? কৃষকদের সাহায্য করুন এবং অভিজ্ঞতা অর্জন করুন।",
     "expert.vol.name": "পুরো নাম",
     "expert.vol.uni": "বিশ্ববিদ্যালয় / কলেজ",
     "expert.vol.year": "অধ্যয়নের বছর",
@@ -563,38 +621,39 @@ const translations = {
     "expert.vol.upload": "আইডি কার্ড আপলোড করতে ক্লিক করুন",
     "expert.vol.submit": "আবেদন জমা দিন",
     "expert.vol.success_title": "আবেদন জমা হয়েছে!",
-    "expert.vol.success_desc": "স্বেচ্ছাসেবক হওয়ার জন্য ধন্যবাদ। আমরা আপনার আবেদন পর্যালোচনা করব এবং ২৪ ঘন্টার মধ্যে যোগাযোগ করব।"
-  }
+    "expert.vol.success_desc":
+      "স্বেচ্ছাসেবক হওয়ার জন্য ধন্যবাদ। আমরা আপনার আবেদন পর্যালোচনা করব এবং ২৪ ঘন্টার মধ্যে যোগাযোগ করব।",
+  },
 };
 
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState("en");
 
   useEffect(() => {
-    const storedLang = localStorage.getItem('cropShield_lang');
-    if (storedLang && ['en', 'hi', 'bn'].includes(storedLang)) {
+    const storedLang = localStorage.getItem("cropShield_lang");
+    if (storedLang && ["en", "hi", "bn"].includes(storedLang)) {
       setLanguage(storedLang);
     }
   }, []);
 
   const handleSetLanguage = (lang) => {
     setLanguage(lang);
-    localStorage.setItem('cropShield_lang', lang);
+    localStorage.setItem("cropShield_lang", lang);
   };
 
   const t = (key) => {
     return translations[language]?.[key] || key;
   };
 
-  const isIndic = language === 'hi' || language === 'bn';
+  const isIndic = language === "hi" || language === "bn";
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t, isIndic }}>
-      <div className={isIndic ? 'font-bengali' : 'font-sans'}>
-        {children}
-      </div>
+    <LanguageContext.Provider
+      value={{ language, setLanguage: handleSetLanguage, t, isIndic }}
+    >
+      <div className={isIndic ? "font-bengali" : "font-sans"}>{children}</div>
     </LanguageContext.Provider>
   );
 };
